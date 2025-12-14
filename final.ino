@@ -107,6 +107,27 @@ void loop() {
     int light_pct = map(cds_raw, 0, 4095, 0, 99);
 
     // ---------- DEBUG ----------
+
+// ---------- PUMP CONTROL ----------
+    // 기준: 토양 습도가 30% 미만일 경우
+    if (soil_pct < 30) {
+      debugPrintf("=> [PUMP] 습도 부족(%d%%). 펌프 2초 가동 시작\n", soil_pct);
+      
+      // LCD에 작동 표시 (우측 상단에 'P' 표시)
+      lcd.setCursor(15, 0);
+      lcd.print("P");
+
+      digitalWrite(PUMP_PIN, HIGH); // 펌프 켜기 (릴레이/모듈에 따라 LOW가 켜짐일 수도 있음)
+      delay(2000);                  // 2초간 대기 (물 공급)
+      digitalWrite(PUMP_PIN, LOW);  // 펌프 끄기
+
+      debugPrintf("=> [PUMP] 가동 종료\n");
+      
+      // LCD 표시 지우기
+      lcd.setCursor(15, 0);
+      lcd.print(" ");
+    }
+    
     debugPrintf(
       "[SENSOR] air=%.1fC hum=%.1f%% water=%.1fC cds=%d soil=%d(%d%%)\n",
       temp_air, hum, temp_water,
